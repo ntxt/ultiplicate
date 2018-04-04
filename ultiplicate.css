@@ -1,0 +1,114 @@
+body{
+    font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    background-color: #CC1714;
+    color: #FF684B;
+    /*
+    #FF684B
+    #CC1714
+    #00FFDF
+    #3D7399
+    #1480CC
+    */
+}
+.main {
+    margin: auto;
+    padding: 0;
+    width: 80%;
+    text-align: center;
+}
+.stats>*{
+    display:inline-block;
+    vertical-align: top;
+}
+.board{
+    margin:0;
+    padding:0;
+}
+table{
+    border-spacing: 1px 1px 0 0;
+}
+td,th{
+    text-align: right;
+    padding: 0.2em 0.5em 0 0;
+    margin:0;
+    background-color: #FF684B;
+    color: #CC1714;
+    width:1.5em;
+    height:1.5em;
+    line-height: 1.5em;
+}
+td{
+    background-color: white;
+}
+tr,td,th{
+    transition: background-color 500ms linear;    
+}
+.question {
+    font-size: 5em;
+    width:100%;
+    margin-top:2em;
+}
+.highlight {
+    background-color:light#FF684B;
+}
+th.highlight,tr.highlight>th{
+    background-color: #FF684B;
+    color:darkred;    
+}
+input[type="number"] {
+    font-size: 1em;
+    outline: none;
+    color: #CC1714;
+    border: 1px solid white;
+    display: inline-block;
+    font-family: inherit;
+    box-shadow: white 0px 0px 20px;
+}
+input:hover{
+    box-shadow: white 0px 0px 40px;
+}
+.progress{
+    width: 100%;
+    height: 1px;
+    display: inline-block;
+    background-color: white;
+
+}
+.OK input{
+    box-shadow: yellowgreen 0px 0px 40px;
+    background-color: yellowgreen;
+    color: white;
+}
+.test{
+    width:100px;
+}
+.results span{
+    display:inline-block;
+    
+}
+.a,.b,input{
+    display: inline-block;
+    width: 2em;
+    height: 2em;
+    background-color: #FF684B;
+    color: #CC1714;
+    border-radius: 1em;
+    text-align: center;
+    line-height: 1.9em;
+}
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    /* display: none; <- Crashes Chrome on hover */
+    -webkit-appearance: none;
+    margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
+}
+.time{
+    display: inline-block;
+    text-align: center;
+    height:1px;
+    width:100%;
+    background-color: FF684B;
+    margin:2em;
+}
+
+
