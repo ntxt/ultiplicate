@@ -1,12 +1,28 @@
 $(document).ready(function(){
     var $d = $('.main');
-    //$d.append('<div>test</div>');
-    var quest,
+    
+    var lang = {
+            "pl-PL" : {
+                times : " razy ",
+                next  : " OK, następne. "
+            },
+            "en-GB" : {
+                times : " times ",
+                next  : " OK, next one. "
+            },
+            "es-ES" : {
+                times : " por ",
+                next  : " OK, siguiente. "
+            }
+        },
+        locale = getLang(),
+        quest,
         resp = "?",
         timer,
+        respTime = 15,
         results = [],
         matrix = [],
-        weights = []
+        weights = [],
         rowStatus = [];
 
     for(var i = 1; i <= 10; i++){ rowStatus[i] = true; }
@@ -22,7 +38,7 @@ $(document).ready(function(){
         return {            
             a : ab.a,
             b : ab.b,
-            time : 10,
+            time : respTime,
             timeLeft : 0,
             timeStep : 0.1
         }
@@ -158,7 +174,7 @@ $(document).ready(function(){
         }
     }
     function markTimeout(){
-        say(" " + (quest.a * quest.b) + "!OK, Następne",);//"! OK, Nastempne");
+        say(" " + (quest.a * quest.b) + lang[locale].next,);
         clearInterval(timer);
         storeResult(false);
         calculateMatrix();
@@ -188,7 +204,7 @@ $(document).ready(function(){
         results.push(quest);
     }
     function drawNewQuest(){
-        renderWeights();
+        renderResults();
         var countDown = 40,
             drawTimer = setInterval(function(){
                 $('.test').html(countDown);
@@ -200,19 +216,20 @@ $(document).ready(function(){
                     startTimer(quest);
                     clearOK();
                     $("input").val("").focus();
-                    say(quest.a + " razy " + quest.b +"?");
+                    say(quest.a + lang[locale].times + quest.b +"?");
                 }
             }, 50);
         
     }
 
-    function renderWeights(){
+    function renderResults(){
         if(!weights || weights.length === 0) return;
         var $r = $(".results .bg"),
             avg = weights.reduce( function(a, b){ 
                 return (a.w || a) + b.w; 
             } ) / weights.length;
-        $r.height((100 * avg)+"%");
+        $r.width((100 * avg)+"%");
+        $(".results .label").html((100 * avg).toFixed(2));
         //$r.html(Math.floor(avg * 100));
         //weights.forEach(function(v){
         //    $r.prepend("<span>"+v.a+" x "+v.b+": " + v.w.toFixed(2) + "</span>");
@@ -222,12 +239,17 @@ $(document).ready(function(){
     function say(text){
         var msg = new SpeechSynthesisUtterance();    
         //msg.voice = window.speechSynthesis.getVoices()[1];
-        msg.lang = "pl-PL";
+        msg.lang = getLang();
         msg.rate = 1;
         msg.pitch = 1;    
         msg.text = text;
 
-  
         speechSynthesis.speak(msg);
+    }
+
+    function getLang(){
+        if (navigator.languages != undefined) 
+        return navigator.languages[0]; 
+        else return navigator.language;
     }
 });
