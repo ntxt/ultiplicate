@@ -6,11 +6,14 @@ $(document).ready(function(){
         timer,
         results = [],
         matrix = [],
-        weights = [];
+        weights = []
+        rowStatus = [];
 
+    for(var i = 1; i <= 10; i++){ rowStatus[i] = true; }
     $('input').keydown(handleKeyDown).keyup(handleKeyUp);
     drawNewQuest();
     calculateMatrix();
+    calculateWeights();
     renderBoard();
 
 
@@ -24,9 +27,13 @@ $(document).ready(function(){
             timeStep : 0.1
         }
     }
-    function weightedRandom(){
+
+    function calculateWeights(){
         weights = [];
         for(var y=2; y<=10; y++){
+            
+            if(!rowStatus[y]) continue;
+
             for(var x=2; x<=10; x++){
                 weights.push({
                     b: y,
@@ -39,10 +46,11 @@ $(document).ready(function(){
             if(m.w < n.w) return -1;
             if(m.w > n.w) return 1;
             return 0;
-        })
-        var scope = weights.length * 0.05;
-
-        return weights[Math.floor(Math.random()*scope)];
+        });
+    }
+    function weightedRandom(){
+        var scope = Math.max( weights.length * 0.05, 2);
+        return weights[Math.ceil(Math.random()*scope)];
     }
     function random(){
         return Math.floor(Math.random() * 9 + 2);
@@ -73,7 +81,9 @@ $(document).ready(function(){
     function renderBoard(){
         var t = $('table.board').empty();
         for(var y=1; y<=10; y++){
-            var row = $('<tr>');
+            var row = $('<tr>')
+                .on("click", toggleRow)
+                .addClass(rowStatus[y] ? "" : "out");
             for(var x=1; x<=10; x++){
                 var isHeader = (x === 1 || y === 1),
                     cell = isHeader ? $('<th>') : $('<td>'),
@@ -86,8 +96,19 @@ $(document).ready(function(){
         return t;
     }
 
+    function toggleRow(){
+        var rowIndex = $(this).index() + 1;
+        rowStatus[rowIndex] = !rowStatus[rowIndex];
+        
+        if(rowStatus[rowIndex]) {
+            $(this).removeClass('out');
+        } else {
+            $(this).addClass('out');
+        }
+    }
+
     function calculateMatrix(){
-        var m = [];;
+        var m = [];
         
         for(var y=1; y<=10; y++){
             m[y] = [];
@@ -101,10 +122,14 @@ $(document).ready(function(){
         for(var y=1; y<=10; y++){
             for(var x=1; x<=10; x++){
                 var scores = m[y][x];
-                m[y][x] = scores.reduce(function(a,b){ return a+b; }) / scores.length;
+                m[y][x] = average(scores);
             }
         }
         matrix = m;
+    }
+
+    function average(arr){
+        return arr.reduce(function(a,b){ return a+b; }) / arr.length;
     }
 
     function highlight(){
@@ -133,17 +158,21 @@ $(document).ready(function(){
         }
     }
     function markTimeout(){
+        say(" " + (quest.a * quest.b) + "!OK, Następne",);//"! OK, Nastempne");
         clearInterval(timer);
         storeResult(false);
         calculateMatrix();
+        calculateWeights();
         renderBoard();
         drawNewQuest();
     }
     function markOK(){
         $('.question').addClass('OK');
+        say((quest.a * quest.b));
         clearInterval(timer);
         storeResult(true);
         calculateMatrix();
+        calculateWeights();
         renderBoard();
         drawNewQuest();        
     }
@@ -159,7 +188,6 @@ $(document).ready(function(){
         results.push(quest);
     }
     function drawNewQuest(){
-        //renderHistory();
         renderWeights();
         var countDown = 40,
             drawTimer = setInterval(function(){
@@ -172,19 +200,34 @@ $(document).ready(function(){
                     startTimer(quest);
                     clearOK();
                     $("input").val("").focus();
+                    say(quest.a + " razy " + quest.b +"?");
                 }
             }, 50);
+        
     }
-    function renderHistory(){
-        var $r = $(".results").empty();
-        results.forEach(function(v){
-            $r.prepend("<span class='"+(v.isOK ? "OK" : "wrong")+"'>"+v.a+" x "+v.b+"</span>");
-        })
-    }
+
     function renderWeights(){
-        var $r = $(".results").empty();
-        weights.forEach(function(v){
-            $r.prepend("<span>"+v.a+" x "+v.b+": " + v.w.toFixed(2) + "</span>");
-        })
+        if(!weights || weights.length === 0) return;
+        var $r = $(".results .bg"),
+            avg = weights.reduce( function(a, b){ 
+                return (a.w || a) + b.w; 
+            } ) / weights.length;
+        $r.height((100 * avg)+"%");
+        //$r.html(Math.floor(avg * 100));
+        //weights.forEach(function(v){
+        //    $r.prepend("<span>"+v.a+" x "+v.b+": " + v.w.toFixed(2) + "</span>");
+        //})
+    }
+
+    function say(text){
+        var msg = new SpeechSynthesisUtterance();    
+        //msg.voice = window.speechSynthesis.getVoices()[1];
+        msg.lang = "pl-PL";
+        msg.rate = 1;
+        msg.pitch = 1;    
+        msg.text = text;
+
+  
+        speechSynthesis.speak(msg);
     }
 });
